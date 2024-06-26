@@ -6,6 +6,9 @@ import { useNavigate } from "react-router-dom";
 import ArticuloModal from "../Modals/ArticuloModal";
 import { useState, useEffect } from "react";
 import { ArticuloService } from "../../services/ArticuloService";
+import { Proveedor } from "../../types/Proveedor";
+import { ModeloInventario } from "../../types/ModeloInventario";
+
 
 
 const ArticuloTable = () => {
@@ -20,7 +23,11 @@ const ArticuloTable = () => {
         fetchArticulos();
     }, [refreshData]);
     console.log(JSON.stringify(articulos, null, 2));
-
+    const proveedor: Proveedor = {
+        id: 0,
+        nombre: ''
+    };
+    
     const initializableNewArticulo = (): Articulo => {
         return {
             id:0,
@@ -31,14 +38,16 @@ const ArticuloTable = () => {
             costoPedido: 0,
             demandaAnual: 0,
             loteOptimo: 0,
-            modeloInventario: '',
+            modeloInventario: ModeloInventario.LOTE_FIJO,
             nombre: '',
             precio: 0,
             puntoPedido: 0,
             stockActual: 0,	
             stockSeguridad: 0,
             tiempoRevision: 0,	
-            proveedorPred: '',
+            proveedorPred: proveedor,
+            
+            
         };
     };
 
@@ -109,9 +118,9 @@ const ArticuloTable = () => {
                 <ArticuloModal
                     show={showModal}
                     onHide={() => setShowModal(false)}
-                    title={title}
+                    nombre={'nombre'}
                     modalType={modalType}
-                    prod={articulo}
+                    Articulo={articulo}
                     refreshData={setRefreshData}
                 />
             )}

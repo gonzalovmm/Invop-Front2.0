@@ -3,6 +3,11 @@ import { Articulo } from "../types/Articulo";
 const BASE_URL ='http://localhost:8082'; 
 
 export const ArticuloService = {
+    getVentas:async (): Promise<Articulo[]>=>{
+        const response = await fetch(`${BASE_URL}//all`);
+        const data = await response.json();
+        return data;
+    },
 
     // Me devuelve un array con todos los articulos
     getArticulos:async (): Promise<Articulo[]> => {
@@ -32,7 +37,7 @@ export const ArticuloService = {
     },
 
     updateArticulo: async (id:number, articulo:Articulo): Promise<Articulo> => {
-        const response = await fetch(`${BASE_URL}/api/v1/articulos/${articulo.id}`, {
+        const response = await fetch(`${BASE_URL}/api/v1/articulos/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

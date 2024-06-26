@@ -1,3 +1,6 @@
+import { ModeloInventario } from "./ModeloInventario";
+import { Proveedor } from "./Proveedor";
+
 export interface Articulo{
     id:number
     cantidadAPedir: number;
@@ -7,14 +10,13 @@ export interface Articulo{
     costoPedido: number;
     demandaAnual: number;
     loteOptimo: number;
-    modeloInventario: string;	
+    modeloInventario: ModeloInventario;	
     nombre: string;
     precio: number;
     puntoPedido: number;	
     stockActual: number;	
     stockSeguridad: number;
     tiempoRevision: number;	
-    proveedorPred: string;	
-
+    proveedorPred: Proveedor;	
 }
 

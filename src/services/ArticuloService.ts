@@ -19,8 +19,10 @@ export const ArticuloService = {
     
     createArticulo: async (articulo: Articulo): Promise<Articulo> => {
         const response = await fetch(`${BASE_URL}/api/v1/articulos`, {
-            method: 'POST',
+            method: "POST",
             headers: {
+                'Accept': '*/*',
+                'Authorization': `Bearer ` + localStorage.getItem('token'),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(articulo)

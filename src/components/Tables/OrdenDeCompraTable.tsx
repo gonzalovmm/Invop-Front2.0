@@ -1,10 +1,11 @@
-import { Button, Modal } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { OrdenDeCompra } from "../../types/OrdenDeCompra";
 import { OrdenDeCompraService } from "../../services/OrdenDeCompraService";
 import OrdenDeCompraModal from "../Modals/OrdenDeCompraModal";
 import { ModalType } from "../../types/ModalType";
+import { EstadoOrdenCompra } from "../../types/EstadoOrdenCompra"; // Importar el enum
 
 const OrdenDeCompraTable = () => {
   const [ordenes, setOrdenes] = useState<OrdenDeCompra[]>([]);
@@ -12,6 +13,7 @@ const OrdenDeCompraTable = () => {
   const [modalType, setModalType] = useState<ModalType>(ModalType.NONE);
   const [selectedOrden, setSelectedOrden] = useState<OrdenDeCompra | null>(null);
   const [refreshData, setRefreshData] = useState(false);
+  const [filtroEstado, setFiltroEstado] = useState<EstadoOrdenCompra | null>(null); // Estado seleccionado
 
   useEffect(() => {
     fetchOrdenes();
@@ -43,12 +45,20 @@ const OrdenDeCompraTable = () => {
     }
   };
 
-  const handleFilterByEstado = async (estado: string) => {
+  const handleFilterByEstado = async (estado: EstadoOrdenCompra) => {
     try {
       const data = await OrdenDeCompraService.filterOrdenesByEstado(estado);
       setOrdenes(data);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const handleFilterButtonClick = () => {
+    if (filtroEstado) {
+      handleFilterByEstado(filtroEstado);
+    } else {
+      console.warn("Seleccione un estado válido para filtrar.");
     }
   };
 
@@ -60,6 +70,32 @@ const OrdenDeCompraTable = () => {
       >
         Nueva Orden de Compra
       </Button>
+
+      {/* Selector de Estado */}
+      <div className="mb-4 flex items-center">
+        <Form.Select
+          value={filtroEstado ?? ""}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+            setFiltroEstado(e.target.value as EstadoOrdenCompra)
+          }
+          className="mr-2"
+        >
+          <option value="">Seleccionar Estado...</option>
+          {Object.values(EstadoOrdenCompra).map((estado) => (
+            <option key={estado} value={estado}>
+              {estado}
+            </option>
+          ))}
+        </Form.Select>
+        <Button
+          variant="primary"
+          className="py-2 px-4"
+          onClick={handleFilterButtonClick}
+        >
+          Filtrar
+        </Button>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
@@ -74,13 +110,13 @@ const OrdenDeCompraTable = () => {
           </thead>
           <tbody>
             {ordenes.map((orden) => (
-              <tr key={orden.id}>
-                <td className="py-2 px-4 border-b">{orden.id}</td>
-                <td className="py-2 px-4 border-b">{orden.estadoOC}</td>
-                <td className="py-2 px-4 border-b">{orden.fechaOC}</td>
-                <td className="py-2 px-4 border-b">{orden.totalOC}</td>
-                <td className="py-2 px-4 border-b">{orden.idProveedorArticulo}</td>
-                <td className="py-2 px-4 border-b">
+              <tr key={orden.id} className="border-b">
+                <td className="py-2 px-4 center">{orden.id}</td>
+                <td className="py-2 px-4">{orden.estadoOrdenCompra}</td>
+                <td className="py-2 px-4">{orden.fechaOrdenCompra}</td>
+                <td className="py-2 px-4">{orden.totalOrdenCompra}</td>
+                <td className="py-2 px-4">{orden.proveedor.id}</td>
+                <td className="py-2 px-4">
                   <Button
                     variant="outline-info"
                     size="sm"
@@ -117,7 +153,7 @@ const OrdenDeCompraTable = () => {
         onHide={() => setShowModal(false)}
         title={modalType === ModalType.CREATE ? "Nueva Orden de Compra" : "Editar Orden de Compra"}
         modalType={modalType}
-        orden={selectedOrden ?? { id: 0, estadoOC: "", fechaOC: "", totalOC: 0, idProveedorArticulo: 0 }}
+        orden={selectedOrden ?? { id: 0, estadoOrdenCompra: "", fechaOrdenCompra: "", totalOrdenCompra: 0}}
         refreshData={() => setRefreshData((prev) => !prev)}
       />
     </>

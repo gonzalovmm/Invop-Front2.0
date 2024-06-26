@@ -6,18 +6,16 @@ import { useNavigate } from "react-router-dom";
 import ArticuloModal from "../Modals/ArticuloModal";
 import { useState, useEffect } from "react";
 import { ArticuloService } from "../../services/ArticuloService";
-import Loader from "../Loader/Loader";
+
 
 const ArticuloTable = () => {
     const [articulos, setArticulos] = useState<Articulo[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
     const [refreshData, setRefreshData] = useState(false);
 
     useEffect(() => {
         const fetchArticulos = async () => {
             const articulos = await ArticuloService.getArticulos();
             setArticulos(articulos);
-            setIsLoading(false);
         };
         fetchArticulos();
     }, [refreshData]);
@@ -25,23 +23,22 @@ const ArticuloTable = () => {
 
     const initializableNewArticulo = (): Articulo => {
         return {
-            id: 0,
-            cantidad_a_pedir: 0,
-            cantidad_maxima: 0,
+            id:0,
+            cantidadAPedir: 0,
+            cantidadMaxima: 0,
             cgi: 0,
-            costo_almacenamiento: 0,
-            costo_pedido: 0,
-            demanda_anual: 0,
-            lote_optimo: 0,
-            modelo_inventario: "",
-            nombre_articulo: "",
-            precio_articulo: 0,
-            punto_pedido: 0,
-            stock_actual: 0,
-            stock_seguridad: 0,
-            tiempo_revision: 0,
-            proveedor_predeterminado: "",
-            seleccionado: false
+            costoAlmacenamiento: 0,
+            costoPedido: 0,
+            demandaAnual: 0,
+            loteOptimo: 0,
+            modeloInventario: '',
+            nombre: '',
+            precio: 0,
+            puntoPedido: 0,
+            stockActual: 0,	
+            stockSeguridad: 0,
+            tiempoRevision: 0,	
+            proveedorPred: '',
         };
     };
 
@@ -84,10 +81,10 @@ const ArticuloTable = () => {
                         <tbody>
                             {articulos.map(articulo => (
                                 <tr key={articulo.id}>
+                                    <td className="py-2 px-4 border-b">{articulo.nombre}</td>
+                                    <td className="py-2 px-4 border-b">{articulo.precio}</td>
+                                    <td className="py-2 px-4 border-b">{articulo.stockActual}</td>
                                     <td className="py-2 px-4 border-b">{articulo.id}</td>
-                                    <td className="py-2 px-4 border-b">{articulo.precio_articulo}</td>
-                                    <td className="py-2 px-4 border-b">{articulo.stock_actual}</td>
-                                    <td className="py-2 px-4 border-b">{articulo.proveedor_predeterminado}</td>
                                     <td className="py-2 px-4 border-b">
                                         <button 
                                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
@@ -96,6 +93,7 @@ const ArticuloTable = () => {
                                             Ir a Demanda
                                         </button>
                                     </td>
+                                    <td></td>
                                     <td className="py-2 px-4 border-b">
                                         <EditButton onClick={() => handleClick("Editar articulo", articulo, ModalType.UPDATE)} />
                                     </td>

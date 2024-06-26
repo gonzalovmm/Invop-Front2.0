@@ -10,7 +10,6 @@ import Modal from "react-bootstrap/esm/Modal";
 import * as Yup from "yup";
 import { Button, Form, FormLabel, ModalFooter, ModalTitle } from "react-bootstrap";
 
-
 type ArticuloModalProps = {
   show: boolean;
   onHide: () => void;
@@ -27,9 +26,7 @@ const ArticuloModal = ({
   modalType,
   Articulo: articulo,
   refreshData,
-
 }: ArticuloModalProps) => {
-
   const initialValues = {
     id: articulo?.id || 0,
     cantidadAPedir: articulo?.cantidadAPedir || 0,
@@ -39,7 +36,7 @@ const ArticuloModal = ({
     costoPedido: articulo?.costoPedido || 0,
     demandaAnual: articulo?.demandaAnual || 0,
     loteOptimo: articulo?.loteOptimo || 0,
-    modeloInventario: articulo?.modeloInventario || 0,
+    modeloInventario: articulo?.modeloInventario || "",
     nombre: articulo?.nombre || '',
     precio: articulo?.precio || 0,
     puntoPedido: articulo?.puntoPedido || 0,
@@ -54,7 +51,7 @@ const ArticuloModal = ({
     try {
       const isNew = art.id === 0;
       if (isNew) {
-        await ArticuloService.createArticulo(art)
+        await ArticuloService.createArticulo(art);
       } else {
         await ArticuloService.updateArticulo(art.id, art);
       }
@@ -67,11 +64,9 @@ const ArticuloModal = ({
       console.error(error);
       toast.error("Ocurrió un error");
     }
-
   };
 
   //DELETE
-  //atento al argumento de assync porque no deberia ir pero tira error en art.id sino 
   const handleDelete = async () => {
     try {
       await ArticuloService.deleteArticulo(articulo.id);
@@ -82,21 +77,19 @@ const ArticuloModal = ({
       refreshData(prevState => !prevState);
     } catch (error) {
       console.error(error);
-      toast.error("Ocurrio un error");
-    };
-  }
+      toast.error("Ocurrió un error");
+    }
+  };
 
   //Esquema YUP DE VALIDACION
-  const validationSchema = () => {
-    return Yup.object().shape({
-      id: Yup.number().integer().min(0),
-      denominacion: Yup.string().required('Se requiere el nombre del artículo'),
-    });
-  };
+  const validationSchema = Yup.object().shape({
+    id: Yup.number().integer().min(0),
+    nombre: Yup.string().required('Se requiere el nombre del artículo'),
+  });
 
   const formik = useFormik({
     initialValues: initialValues,
-    validationSchema: validationSchema(),
+    validationSchema: validationSchema,
     validateOnChange: true,
     validateOnBlur: true,
     onSubmit: (art: Articulo) => handleSaveUpdate(art),
@@ -105,30 +98,28 @@ const ArticuloModal = ({
   return (
     <>
       {modalType === ModalType.DELETE ? (
-        <>
-          <Modal show={show} onHide={onHide} centered backdrop="static">
-            <Modal.Header>
-              <ModalTitle>{nombre}</ModalTitle>
-            </Modal.Header>
+        <Modal show={show} onHide={onHide} centered backdrop="static">
+          <div className="p-6 bg-white rounded-lg shadow-xl">
+            <ModalTitle className="text-lg font-bold">{nombre}</ModalTitle>
             <Modal.Body>
-              <p>¿Está seguro de querer eliminar el articulo <br /> <strong>{articulo.nombre}</strong>?</p>
+              <p className="mt-4">¿Está seguro de querer eliminar el articulo <br /> <strong>{articulo.nombre}</strong>?</p>
             </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={onHide}>No, volver</Button>
+            <ModalFooter className="mt-4 flex justify-end">
+              <Button variant="secondary" onClick={onHide} className="mr-2">No, volver</Button>
               <Button variant="danger" onClick={handleDelete}>Sí, confirmar</Button>
-            </Modal.Footer>
-          </Modal>
-        </>
+            </ModalFooter>
+          </div>
+        </Modal>
       ) : (
-        <>
-          <Modal show={show} onHide={onHide} centered backdrop="static">
+        <Modal show={show} onHide={onHide} centered backdrop="static">
+          <div className="p-6 bg-white rounded-lg shadow-xl">
             <Modal.Header closeButton>
-              <ModalTitle>{nombre}</ModalTitle>
+              <ModalTitle className="text-lg font-bold">{nombre}</ModalTitle>
             </Modal.Header>
             <Modal.Body>
               <Form onSubmit={formik.handleSubmit}>
-                <Form.Group>
-                  <FormLabel>Nombre</FormLabel>
+                <Form.Group className="mb-4">
+                  <FormLabel className="block text-gray-700">Nombre</FormLabel>
                   <Form.Control
                     name="nombre"
                     type="text"
@@ -136,29 +127,31 @@ const ArticuloModal = ({
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     isInvalid={Boolean(formik.errors.nombre && formik.touched.nombre)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   />
                   <Form.Control.Feedback type="invalid">
                     {formik.errors.nombre}
                   </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Group>
-                  <FormLabel>Precio</FormLabel>
+                <Form.Group className="mb-4">
+                  <FormLabel className="block text-gray-700">Precio</FormLabel>
                   <Form.Control
                     name="precio"
                     type="number"
                     value={formik.values.precio}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    isInvalid={Boolean(formik.errors.precio && formik.touched.precio)} //OJOOOOOOOOOOOOOOOOOOO
+                    isInvalid={Boolean(formik.errors.precio && formik.touched.precio)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   />
                   <Form.Control.Feedback type="invalid">
                     {formik.errors.precio}
                   </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Group>
-                  <FormLabel>Costo Almacenamiento</FormLabel>
+                <Form.Group className="mb-4">
+                  <FormLabel className="block text-gray-700">Costo Almacenamiento</FormLabel>
                   <Form.Control
                     name="costoAlmacenamiento"
                     type="number"
@@ -166,14 +159,15 @@ const ArticuloModal = ({
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     isInvalid={Boolean(formik.errors.costoAlmacenamiento && formik.touched.costoAlmacenamiento)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   />
                   <Form.Control.Feedback type="invalid">
                     {formik.errors.costoAlmacenamiento}
                   </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Group>
-                  <FormLabel>Modelo Inventario</FormLabel>
+                <Form.Group className="mb-4">
+                  <FormLabel className="block text-gray-700">Modelo Inventario</FormLabel>
                   <Form.Control
                     as="select"
                     name="modeloInventario"
@@ -181,6 +175,7 @@ const ArticuloModal = ({
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     isInvalid={formik.touched.modeloInventario && !!formik.errors.modeloInventario}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   >
                     <option value="">Selecciona un Modelo de Inventario</option>
                     {Object.values(ModeloInventario).map((modelo) => (
@@ -194,8 +189,8 @@ const ArticuloModal = ({
                   </Form.Control.Feedback>
                 </Form.Group>
 
-                <Form.Group>
-                  <FormLabel>Costo de pedido</FormLabel>
+                <Form.Group className="mb-4">
+                  <FormLabel className="block text-gray-700">Costo de pedido</FormLabel>
                   <Form.Control
                     name="costoPedido"
                     type="number"
@@ -203,34 +198,24 @@ const ArticuloModal = ({
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     isInvalid={Boolean(formik.errors.costoPedido && formik.touched.costoPedido)}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   />
                   <Form.Control.Feedback type="invalid">
-                    {formik.errors.costoAlmacenamiento}
+                    {formik.errors.costoPedido}
                   </Form.Control.Feedback>
                 </Form.Group>
 
+                <ModalFooter className="mt-4 flex justify-end">
+                  <Button variant="secondary" onClick={onHide} className="mr-2">Cancelar</Button>
+                  <Button variant="primary" type="submit">Guardar</Button>
+                </ModalFooter>
               </Form>
             </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={onHide}>Cancelar</Button>
-              <Button variant="primary" onClick={formik.submitForm}>Guardar</Button>
-            </Modal.Footer>
-
-          </Modal>
-
-        </>
-
-
-      )
-
-
-
-      }
-
-
-
+          </div>
+        </Modal>
+      )}
     </>
-  )
+  );
+};
 
-}
 export default ArticuloModal;

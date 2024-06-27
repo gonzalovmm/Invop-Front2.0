@@ -15,7 +15,7 @@ type ArticuloModalProps = {
   onHide: () => void;
   nombre: string;
   modalType: ModalType;
-  Articulo: Articulo;
+  art: Articulo;
   refreshData: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -24,7 +24,7 @@ const ArticuloModal = ({
   onHide,
   nombre,
   modalType,
-  Articulo: articulo,
+  art: articulo,
   refreshData,
 }: ArticuloModalProps) => {
   const initialValues = {
@@ -55,31 +55,31 @@ const ArticuloModal = ({
       } else {
         await ArticuloService.updateArticulo(art.id, art);
       }
-      toast.success(isNew ? "Artículo creado" : "Artículo actualizado", {
-        position: "top-center",
-      });
-      onHide();
-      refreshData(prevState => !prevState);
+    
+  
     } catch (error) {
       console.error(error);
       toast.error("Ocurrió un error");
     }
+    onHide();
+    refreshData(prevState => !prevState);
   };
 
   //DELETE
   const handleDelete = async () => {
+    console.log ("Voy a borrar")
     try {
       await ArticuloService.deleteArticulo(articulo.id);
       toast.success("Artículo eliminado", {
         position: "top-center",
-      });
+      })
       onHide();
       refreshData(prevState => !prevState);
     } catch (error) {
       console.error(error);
       toast.error("Ocurrió un error");
-    }
-  };
+    };
+  }
 
   //Esquema YUP DE VALIDACION
   const validationSchema = Yup.object().shape({
@@ -100,7 +100,7 @@ const ArticuloModal = ({
       {modalType === ModalType.DELETE ? (
         <Modal show={show} onHide={onHide} centered backdrop="static">
           <div className="p-6 bg-white rounded-lg shadow-xl">
-            <ModalTitle className="text-lg font-bold">{nombre}</ModalTitle>
+            <ModalTitle className="text-lg font-bold">{articulo.nombre}</ModalTitle>
             <Modal.Body>
               <p className="mt-4">¿Está seguro de querer eliminar el articulo <br /> <strong>{articulo.nombre}</strong>?</p>
             </Modal.Body>

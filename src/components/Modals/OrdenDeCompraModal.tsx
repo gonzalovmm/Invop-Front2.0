@@ -28,10 +28,10 @@ const OrdenDeCompraModal = ({
 
   const initialValues = {
     id: orden.id,
-    estadoOC: orden.estadoOC,
-    fechaOC: orden.fechaOC,
-    totalOC: orden.totalOC,
-    idProveedorArticulo: orden.idProveedorArticulo,
+    estadoOC: orden.estadoOrdenCompra,
+    fechaOC: orden.fechaOrdenCompra,
+    totalOC: orden.totalOrdenCompra,
+    proveedor: orden.proveedor.id,
   };
 
   const handleSaveUpdate = async (ord: OrdenDeCompra) => {
@@ -65,7 +65,7 @@ const OrdenDeCompraModal = ({
     initialValues: initialValues,
     validationSchema: validationSchema,
     enableReinitialize: true,
-    onSubmit: (values) => handleSaveUpdate(values as OrdenDeCompra),
+    onSubmit: (values) => handleSaveUpdate( orden),
   });
 
   return (
@@ -132,17 +132,17 @@ const OrdenDeCompraModal = ({
               <Form.Control
                 name="idProveedorArticulo"
                 type="number"
-                value={formik.values.idProveedorArticulo}
+                value={formik.values.proveedor}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 isInvalid={Boolean(
-                  formik.errors.idProveedorArticulo && formik.touched.idProveedorArticulo
+                  formik.errors.proveedor && formik.touched.proveedor
                 )}
                 disabled={modalType === ModalType.VIEW}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               />
               <Form.Control.Feedback type="invalid">
-                {formik.errors.idProveedorArticulo}
+                {formik.errors.proveedor}
               </Form.Control.Feedback>
             </Form.Group>
 

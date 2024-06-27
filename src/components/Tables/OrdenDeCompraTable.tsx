@@ -147,7 +147,7 @@ const OrdenDeCompraTable = () => {
         </table>
       </div>
 
-      {/* Modal */}
+      {/* Modal 
       <OrdenDeCompraModal
         show={showModal}
         onHide={() => setShowModal(false)}
@@ -155,7 +155,7 @@ const OrdenDeCompraTable = () => {
         modalType={modalType}
         orden={selectedOrden ?? { id: 0, estadoOrdenCompra: "", fechaOrdenCompra: "", totalOrdenCompra: 0}}
         refreshData={() => setRefreshData((prev) => !prev)}
-      />
+      />*/}
     </>
   );
 };

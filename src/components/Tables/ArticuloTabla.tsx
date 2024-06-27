@@ -11,18 +11,25 @@ import { ModeloInventario } from "../../types/ModeloInventario";
 
 
 
-const ArticuloTable = () => {
+function ArticuloTable () {
     const [articulos, setArticulos] = useState<Articulo[]>([]);
     const [refreshData, setRefreshData] = useState(false);
 
     useEffect(() => {
         const fetchArticulos = async () => {
+        try{
+            
             const articulos = await ArticuloService.getArticulos();
-            setArticulos(articulos);
+            setArticulos(Array.isArray(articulos)? articulos : []);
+        } catch (error){
+            console.error("Error fetching articulos:", error)
         };
+        }
+        
         fetchArticulos();
     }, [refreshData]);
     console.log(JSON.stringify(articulos, null, 2));
+    
     const proveedor: Proveedor = {
         id: 0,
         nombre: ''
@@ -93,7 +100,7 @@ const ArticuloTable = () => {
                                     <td className="py-2 px-4 border-b">{articulo.nombre}</td>
                                     <td className="py-2 px-4 border-b">{articulo.precio}</td>
                                     <td className="py-2 px-4 border-b">{articulo.stockActual}</td>
-                                    <td className="py-2 px-4 border-b">{articulo.id}</td>
+                                    <td className="py-2 px-4 border-b">{articulo.proveedorPred.id}</td>
                                     <td className="py-2 px-4 border-b">
                                         <button 
                                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
@@ -120,7 +127,7 @@ const ArticuloTable = () => {
                     onHide={() => setShowModal(false)}
                     nombre={'nombre'}
                     modalType={modalType}
-                    Articulo={articulo}
+                    art={articulo}
                     refreshData={setRefreshData}
                 />
             )}

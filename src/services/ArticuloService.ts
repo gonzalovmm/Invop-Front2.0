@@ -49,8 +49,12 @@ export const ArticuloService = {
     },
 
     deleteArticulo: async (id: number): Promise<void> => {
-        await fetch(`${BASE_URL}/api/v1/articulos/${id}`, {
-            method: 'DELETE'
+        await fetch(`${BASE_URL}/api/v1/articulos/baja/${id}`, {
+            method: 'DELETE', 
+            headers: {
+                'Accept': '*/*',
+                'Authorization': `Bearer ` + localStorage.getItem('token'),
+            },
         });
     }
 

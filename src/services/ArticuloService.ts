@@ -4,7 +4,7 @@ const BASE_URL ='http://localhost:8082';
 
 export const ArticuloService = {
     getVentas:async (): Promise<Articulo[]>=>{
-        const response = await fetch(`${BASE_URL}//all`);
+        const response = await fetch(`${BASE_URL}/api/v1/ventas`);
         const data = await response.json();
         return data;
     },

@@ -85,6 +85,12 @@ const ArticuloModal = ({
   const validationSchema = Yup.object().shape({
     id: Yup.number().integer().min(0),
     nombre: Yup.string().required('Se requiere el nombre del artículo'),
+    precio: Yup.number()
+    .positive('El precio debe ser positivo')
+    .required('El precio debe ser mayor a cero'),
+    //Proveedor????
+
+    
   });
 
   const formik = useFormik({

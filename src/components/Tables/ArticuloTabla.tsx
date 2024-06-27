@@ -98,7 +98,7 @@ function ArticuloTable () {
                             {articulos.map(articulo => (
                                 <tr key={articulo.id}>
                                     <td className="py-2 px-4 border-b">{articulo.nombre}</td>
-                                    <td className="py-2 px-4 border-b">{articulo.precio}</td>
+                                    <td className="py-2 px-4 border-b">{Number(articulo.precio).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                                     <td className="py-2 px-4 border-b">{articulo.stockActual}</td>
                                     <td className="py-2 px-4 border-b">{articulo.proveedorPred.id}</td>
                                     <td className="py-2 px-4 border-b">

@@ -36,17 +36,22 @@ export const ArticuloService = {
         return data;
     },
 
-    updateArticulo: async (id:number, articulo:Articulo): Promise<Articulo> => {
-        const response = await fetch(`${BASE_URL}/api/v1/articulos/${id}`, {
+    updateArticulo: async (art: Articulo): Promise<Articulo> => {
+        const response = await fetch(`${BASE_URL}/api/v1/articulos/${art.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(articulo)
+            body: JSON.stringify(art) 
         });
-        const data= await response.json();
+        if (!response.ok) {
+            throw new Error('Failed to update articulo');
+        }
+        const data = await response.json();
         return data;
     },
+    
+    
 
     deleteArticulo: async (id: number): Promise<void> => {
         await fetch(`${BASE_URL}/api/v1/articulos/baja/${id}`, {
@@ -56,6 +61,20 @@ export const ArticuloService = {
                 'Authorization': `Bearer ` + localStorage.getItem('token'),
             },
         });
+    },
+
+    calcularTodo: async (articuloId: number): Promise<Articulo> => {
+        const response = await fetch(`${BASE_URL}/api/v1/articulos/calculos/${articuloId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to calculate articulo values');
+        }
+        const data = await response.json();
+        return data;
     }
 
 }

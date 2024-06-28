@@ -7,8 +7,8 @@ const Navbar: React.FC = () => {
             <ul className="flex justify-around list-none">
                 <li><Link className="text-white font-bold hover:underline active:underline" to="/">Inicio</Link></li>
                 <li><Link className="text-white font-bold hover:underline" to="/articulo">Artículos</Link></li>
+                <li><Link className="text-white font-bold hover:underline" to="/venta">Ventas</Link></li>
                 <li><Link className="text-white font-bold hover:underline" to="/demanda">Demanda</Link></li>
-                <li><Link className="text-white font-bold hover:underline" to="/articulo">Ventas</Link></li>
                 <li><Link className="text-white font-bold hover:underline" to="/orden-de-compra">Orden de Compra</Link></li>
             </ul>
         </nav>

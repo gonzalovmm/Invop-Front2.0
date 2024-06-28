@@ -5,7 +5,7 @@ const BASE_URL ='http://localhost:8082';
 
 export const VentaService= {
     getVentas:async (): Promise<Venta[]>=>{
-        const response = await fetch(`${BASE_URL}/all`);
+        const response = await fetch(`${BASE_URL}/api/v1/ventas`);
         const data = await response.json();
         return data;
     },
@@ -31,7 +31,7 @@ export const VentaService= {
             cantidad: as.cantidad
         }));
         //validArticulos es un array que contiene solamente aquellos articulos que sean validos 
-        const response = await fetch(`${BASE_URL}api/v1/ventas`, {
+        const response = await fetch(`${BASE_URL}api/v1/ventas/nuevaVenta`, {
             method: 'POST',
             headers: {
                 'Accept': '*/*',
@@ -48,30 +48,5 @@ export const VentaService= {
         const data = await response.json();
         return data;
     },
-
-    updateVenta: async (id: number, venta: Venta): Promise<Venta> => {
-        const response = await fetch(`${BASE_URL}/api/v1/ventas/${id}`, {
-            method: "PUT",
-            headers: {
-                'Accept': '*/*',
-                'Authorization': `Bearer ` + localStorage.getItem('token'),
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(venta)
-        });
-
-        const data = await response.json();
-        return data;
-    }, 
-
-    deleteVenta:async (id:number): Promise<void> => {
-        await fetch (`${BASE_URL}/api/v1/ventas/${id}`,{
-            method: "DELETE",
-            headers: {
-                'Accept': '*/*',
-                'Authorization': `Bearer ` + localStorage.getItem('token'),
-            },
-        });
-    }
 
 }

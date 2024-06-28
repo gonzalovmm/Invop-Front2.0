@@ -1,9 +1,11 @@
-import React from 'react'
+import DemandaTabla from "../components/Tables/DemandaTabla";
 
-function Demanda() {
-  return (
-    <div>Demanda</div>
-  )
-}
 
-export default Demanda
+const Demanda = () => {
+    return (
+        <div>
+            <DemandaTabla/>
+        </div>
+    );
+};
+export default Demanda;

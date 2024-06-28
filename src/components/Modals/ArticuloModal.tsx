@@ -8,7 +8,8 @@ import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import Modal from "react-bootstrap/esm/Modal";
 import * as Yup from "yup";
-import { Button, Form, FormLabel, ModalFooter, ModalTitle } from "react-bootstrap";
+import { Button, Form, FormLabel, ModalFooter, ModalTitle, Table } from "react-bootstrap";
+import { ProveedorService } from "../../services/ProveedorService";
 
 type ArticuloModalProps = {
   show: boolean;
@@ -27,6 +28,31 @@ const ArticuloModal = ({
   art: articulo,
   refreshData,
 }: ArticuloModalProps) => {
+  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
+  const [proveedorSeleccionado, setProveedorSeleccionado]= useState<Proveedor|null>(null);
+  const [isNew, setIsNew] = useState(articulo.id === 0);
+  const [valoresCalculados, setValoresCalculados] = useState({ cgi: 0, loteOptimo: 0, puntoPedido: 0 });
+
+
+  useEffect(() => {
+    setIsNew(articulo.id === 0);
+  }, [articulo]);
+
+
+
+  useEffect(() => {
+    const fetchProveedores = async () => {
+      try {
+        const response = await ProveedorService.getProveedores();
+        setProveedores(response);
+      } catch (error) {
+        console.error(error);
+        toast.error("Error al cargar proveedores");
+      }
+    };
+
+    fetchProveedores();
+  }, []);
   const initialValues = {
     id: articulo?.id || 0,
     cantidadAPedir: articulo?.cantidadAPedir || 0,
@@ -45,18 +71,20 @@ const ArticuloModal = ({
     tiempoRevision: articulo?.tiempoRevision || 0,
     proveedorPred: articulo?.proveedorPred || 0,
   };
-
+  
   //CREATE-UPDATE
   const handleSaveUpdate = async (art: Articulo) => {
     try {
       const isNew = art.id === 0;
       if (isNew) {
         await ArticuloService.createArticulo(art);
+        toast.success("Artículo creado con éxito");
       } else {
-        await ArticuloService.updateArticulo(art.id, art);
+        await ArticuloService.updateArticulo(art);
+        toast.success("Artículo actualizado con éxito");
       }
-    
-  
+
+
     } catch (error) {
       console.error(error);
       toast.error("Ocurrió un error");
@@ -65,9 +93,27 @@ const ArticuloModal = ({
     refreshData(prevState => !prevState);
   };
 
+  const handleCalculate = async () => {
+    try {
+      if (!articulo) {
+        throw new Error("No hay un artículo seleccionado para calcular");
+      }
+      const updatedValores = await ArticuloService.calcularTodo(articulo.id); // Ajusta el método según tu lógica
+      setValoresCalculados({
+        cgi: updatedValores.cgi,
+        loteOptimo: updatedValores.loteOptimo,
+        puntoPedido: updatedValores.puntoPedido,
+      });
+      toast.success("Cálculo completado con éxito");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al calcular valores del artículo");
+    }
+  };
+
   //DELETE
   const handleDelete = async () => {
-    console.log ("Voy a borrar")
+    console.log("Voy a borrar")
     try {
       await ArticuloService.deleteArticulo(articulo.id);
       toast.success("Artículo eliminado", {
@@ -86,11 +132,15 @@ const ArticuloModal = ({
     id: Yup.number().integer().min(0),
     nombre: Yup.string().required('Se requiere el nombre del artículo'),
     precio: Yup.number()
-    .positive('El precio debe ser positivo')
-    .required('El precio debe ser mayor a cero'),
-    //Proveedor????
+      .positive('El precio debe ser positivo')
+      .required('El precio debe ser mayor a cero'),
+    tiempoRevision: Yup.number()
+      .positive('El tiempo de revisión debe ser positivo')
+      .required('Se requiere el tiempo de revisión')
+      .nonNullable('El tiempo de revisión no puede ser nulo'),
+    stockActual: Yup.number().integer('El stock actual debe ser un entero')
+     
 
-    
   });
 
   const formik = useFormik({
@@ -103,6 +153,7 @@ const ArticuloModal = ({
 
   return (
     <>
+    
       {modalType === ModalType.DELETE ? (
         <Modal show={show} onHide={onHide} centered backdrop="static">
           <div className="p-6 bg-white rounded-lg shadow-xl">
@@ -115,6 +166,34 @@ const ArticuloModal = ({
               <Button variant="danger" onClick={handleDelete}>Sí, confirmar</Button>
             </ModalFooter>
           </div>
+        </Modal>
+      )  : modalType === ModalType.DETAIL ? (
+        <Modal show={show} onHide={onHide} centered backdrop="static">
+          <Modal.Header closeButton>
+            <Modal.Title>{nombre}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Table className='min-w-full bg-white border border-gray-300'>
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 border-b">CGI</th>
+                  <th className="py-2 px-4 border-b">Lote Óptimo</th>
+                  <th className="py-2 px-4 border-b">Punto de Pedido</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="py-2 px-4 border-b">{valoresCalculados.cgi}</td>
+                  <td className="py-2 px-4 border-b">{valoresCalculados.loteOptimo}</td>
+                  <td className="py-2 px-4 border-b">{valoresCalculados.puntoPedido}</td>
+                </tr>
+              </tbody>
+            </Table>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={onHide}>Cerrar</Button>
+            <Button variant="primary" onClick={handleCalculate}>Calcular Valores</Button>
+          </Modal.Footer>
         </Modal>
       ) : (
         <Modal show={show} onHide={onHide} centered backdrop="static">
@@ -156,21 +235,42 @@ const ArticuloModal = ({
                   </Form.Control.Feedback>
                 </Form.Group>
 
+                {/* tiempoRevision */}
                 <Form.Group className="mb-4">
-                  <FormLabel className="block text-gray-700">Costo Almacenamiento</FormLabel>
+                  <FormLabel className="block text-gray-700">Tiempo de revisión</FormLabel>
                   <Form.Control
-                    name="costoAlmacenamiento"
+                    name="tiempoRevision"
                     type="number"
-                    value={formik.values.costoAlmacenamiento}
+                    value={formik.values.tiempoRevision}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    isInvalid={Boolean(formik.errors.costoAlmacenamiento && formik.touched.costoAlmacenamiento)}
+                    isInvalid={Boolean(formik.errors.tiempoRevision && formik.touched.tiempoRevision)}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   />
                   <Form.Control.Feedback type="invalid">
-                    {formik.errors.costoAlmacenamiento}
+                    {formik.errors.tiempoRevision}
                   </Form.Control.Feedback>
                 </Form.Group>
+                
+                {/* stockactual */}
+
+                {isNew && (
+              <Form.Group className="mb-4">
+                <FormLabel className="block text-gray-700">Stock Actual</FormLabel>
+                <Form.Control
+                  name="stockActual"
+                  type="number"
+                  value={formik.values.stockActual}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  isInvalid={Boolean(formik.errors.stockActual && formik.touched.stockActual)}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+                <Form.Control.Feedback type="invalid">
+                  {formik.errors.stockActual}
+                </Form.Control.Feedback>
+              </Form.Group>
+            )}
 
                 <Form.Group className="mb-4">
                   <FormLabel className="block text-gray-700">Modelo Inventario</FormLabel>
@@ -194,22 +294,35 @@ const ArticuloModal = ({
                     {formik.errors.modeloInventario}
                   </Form.Control.Feedback>
                 </Form.Group>
-
+              
                 <Form.Group className="mb-4">
-                  <FormLabel className="block text-gray-700">Costo de pedido</FormLabel>
+                  <FormLabel className="block text-gray-700">Proveedor</FormLabel>
                   <Form.Control
-                    name="costoPedido"
-                    type="number"
-                    value={formik.values.costoPedido}
-                    onChange={formik.handleChange}
+                    as="select"
+                    value={proveedorSeleccionado?.id}
+                    onChange={(e) => {
+                      const selectedId = Number(e.target.value); // Convertir a número
+                      const selectedProveedor = proveedores.find(proveedor => proveedor.id === selectedId)||null;
+                      setProveedorSeleccionado(selectedProveedor);
+                      formik.setFieldValue("proveedorPred", selectedProveedor);
+                    }}
                     onBlur={formik.handleBlur}
-                    isInvalid={Boolean(formik.errors.costoPedido && formik.touched.costoPedido)}
+                    isInvalid={formik.touched.proveedorPred?.id && !!formik.errors.proveedorPred?.id}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  />
+                  >
+                    <option value="">Selecciona un Proveedor</option>
+                    {proveedores.map(proveedor => (
+                      <option key={proveedor.id} value={proveedor.id}>
+                        {proveedor.nombre}
+                      </option>
+                    ))}
+                  </Form.Control>
                   <Form.Control.Feedback type="invalid">
-                    {formik.errors.costoPedido}
+                    {formik.errors.proveedorPred?.id}
                   </Form.Control.Feedback>
                 </Form.Group>
+
+
 
                 <ModalFooter className="mt-4 flex justify-end">
                   <Button variant="secondary" onClick={onHide} className="mr-2">Cancelar</Button>

@@ -1,10 +1,9 @@
-import { Button, Form, Modal, ModalDialog, Table } from 'react-bootstrap';
+import { Button, Form, Modal } from 'react-bootstrap';
 import { ModalType } from '../../types/ModalType';
 import { Venta } from '../../types/Venta';
 import { useState, useEffect } from 'react';
 import { ArticuloService } from '../../services/ArticuloService';
 import { Articulo } from '../../types/Articulo';
-import 'react-toastify/dist/ReactToastify.css';
 import { VentaService } from '../../services/VentaService';
 import { toast } from 'react-toastify';
 import VentaArticuloTabla from '../Tables/VentaArticuloTabla';
@@ -27,12 +26,13 @@ const VentaModal = ({
     refreshData,
 }: VentaModalProps) => {
     const [articulos, setArticulos] = useState<Articulo[]>([]);
-    const [articulosSeleccionados, setArticulosSeleccionados] = useState<{ articulo: Articulo, cantidad: number, invalid: boolean }[]>([]);
+    const [articuloSeleccionado, setArticuloSeleccionado] = useState<Articulo | null>(null);
+    const [cantidad, setCantidad] = useState(0);
 
     useEffect(() => {
         const fetchArticulos = async () => {
             try {
-                const articulos = await ArticuloService.getVentas();
+                const articulos = await ArticuloService.getArticulos(); // Asegúrate de que el servicio correcto sea llamado
                 setArticulos(Array.isArray(articulos) ? articulos : []);
             } catch (error) {
                 console.error("Error fetching articulos: ", error);
@@ -44,67 +44,35 @@ const VentaModal = ({
     }, []);
 
     const handleGuardar = async () => {
+        if (!articuloSeleccionado || cantidad <= 0) {
+            alert('Por favor, seleccione un artículo y una cantidad válida.');
+            return;
+        }
+
+        const ventaDetalle = {
+            articulo: articuloSeleccionado,
+            cantidad: cantidad,
+            invalid: false,
+        };
+
         try {
-            // Validar que todas las cantidades sean válidas (mayores que cero y dentro del stock)
-            const cantidadesValidas = articulosSeleccionados.every(as => as.cantidad > 0 && as.cantidad <= as.articulo.stockActual);
-            if (!cantidadesValidas) {
-                alert('Por favor, ingrese una cantidad válida para cada artículo seleccionado.');
-                return;
-            }
-
-            // Aquí puedes procesar los artículos seleccionados con sus cantidades
-            // Por ejemplo, guardar en la base de datos, enviar a un servicio, etc.
-
-            // Limpia la selección y oculta el modal
-            
-            VentaService.createVenta(articulosSeleccionados);
-            setArticulosSeleccionados([]);
+            await VentaService.createVenta([ventaDetalle]);
+            setArticuloSeleccionado(null);
+            setCantidad(0);
             onHide();
-            setTimeout(() => {
-                refreshData(prevState => !prevState);
-            }, 500);
+            refreshData(prevState => !prevState);
             toast.success('Venta creada con éxito', { position: 'top-center' });
         } catch (error) {
             console.error('Error al crear la venta:', error);
             toast.error('Error al crear la venta', { position: 'top-center' });
-
         }
     };
 
     const handleCancelar = () => {
-        // Limpia la selección y oculta el modal
-        setArticulosSeleccionados([]);
+        setArticuloSeleccionado(null);
+        setCantidad(0);
         onHide();
     };
-
-    const handleCantidadChange = (articuloId: number, nuevaCantidad: number) => {
-        setArticulosSeleccionados(prevArticulos =>
-            prevArticulos.map(as =>
-                as.articulo.id === articuloId ? { ...as, cantidad: nuevaCantidad, invalid: nuevaCantidad < 0 || nuevaCantidad > as.articulo.stockActual } : as
-            )
-        );
-    };
-
-    const handleArticuloSelect = (articulo: Articulo) => {
-        // Verificar si el artículo ya está seleccionado
-        const articuloExistente = articulosSeleccionados.find(as => as.articulo.id === articulo.id);
-
-        if (articuloExistente) {
-            // Si ya está seleccionado, deseleccionar
-            setArticulosSeleccionados(prevArticulos =>
-                prevArticulos.filter(as => as.articulo.id !== articulo.id)
-            );
-        } else {
-            // Si no está seleccionado, agregarlo con una cantidad inicial (puedes ajustar esto según tus necesidades)
-            setArticulosSeleccionados(prevArticulos => [
-                ...prevArticulos,
-                { articulo: articulo, cantidad: 1, invalid: false } // Cantidad inicial y estado de validez inicial
-            ]);
-        }
-    };
-
-
-
 
     return (
         <>
@@ -115,7 +83,21 @@ const VentaModal = ({
                     <Modal.Title>{nombre}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                <VentaArticuloTabla ventaID={venta.id} />
+                 <table className='min-w-full bg-white border border-gray-300'>
+                 <thead>
+                        <tr >
+                            <th className="py-2 px-4 border-b">Id Articulo</th>
+                            <th className="py-2 px-4 border-b">Subtotal</th>
+                            <th className="py-2 px-4 border-b">Cantidad vendida</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <td className="py-2 px-4 border-b">{articuloSeleccionado?.id}</td>
+                        <td className="py-2 px-4 border-b">{cantidad}</td>
+                        <td className="py-2 px-4 border-b"> {articuloSeleccionado ? articuloSeleccionado.precio * cantidad : 0}</td>
+                    </tbody>
+
+                 </table>
                 </Modal.Body>
                 <Modal.Footer>
 
@@ -125,53 +107,42 @@ const VentaModal = ({
             </>
         ) :(
         <div >
-        <Modal show={show} onHide={handleCancelar} centered className="l" style={{paddingTop:'400px'}}>
-            <Modal.Header closeButton >
+         <Modal show={show} onHide={handleCancelar} centered>
+            <Modal.Header closeButton>
                 <Modal.Title>{nombre}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                    <Form>
-                        <Table striped bordered hover>
-                            <thead>
-                                <tr>
-                                    <th>Seleccionar</th>
-                                    <th>Nombre Artículo</th>
-                                    <th>Stock Actual</th>
-                                    <th>Cantidad a Vender</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {articulos.map(articulo => (
-                                    <tr key={articulo.id}>
-                                        <td>
-                                            <Form.Check
-                                                type="checkbox"
-                                                onChange={() => handleArticuloSelect(articulo)}
-                                                checked={!!articulosSeleccionados.find(as => as.articulo.id === articulo.id)}
-                                            />
-                                        </td>
-                                        <td>{articulo.nombre}</td>
-                                        <td>{articulo.stockActual}</td>
-                                        <td>
-                                            <Form.Control
-                                                type="number"
-                                                min={0}
-                                                max={articulo.stockActual}
-                                                value={articulosSeleccionados.find(as => as.articulo.id === articulo.id)?.cantidad || ''}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                    const cantidad = Number(e.target.value);
-                                                    handleCantidadChange(articulo.id, cantidad); // Llama a handleCantidadChange con el valor
-                                                }}
-                                                isInvalid={!!articulosSeleccionados.find(as => as.articulo.id === articulo.id)?.invalid} // Usa el estado de validez
-                                                disabled={!articulosSeleccionados.find(as => as.articulo.id === articulo.id)}
-                                            />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
-                    </Form>
-                </Modal.Body>
+                <Form>
+                    <Form.Group>
+                        <Form.Label>Seleccione Artículo</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={articuloSeleccionado?.id || ''}
+                            onChange={(e) => {
+                                const selectedId = Number(e.target.value);
+                                const selectedArticulo = articulos.find(a => a.id === selectedId) || null;
+                                setArticuloSeleccionado(selectedArticulo);
+                            }}
+                        >
+                            <option value="">Seleccione un artículo</option>
+                            {articulos.map(articulo => (
+                                <option key={articulo.id} value={articulo.id}>
+                                    {articulo.nombre} (Stock: {articulo.stockActual})
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Cantidad a Vender</Form.Label>
+                        <Form.Control
+                            type="number"
+                            min={1}
+                            value={cantidad}
+                            onChange={(e) => setCantidad(Number(e.target.value))}
+                        />
+                    </Form.Group>
+                </Form>
+            </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleCancelar}>
                     Cancelar
@@ -188,4 +159,8 @@ const VentaModal = ({
     );
 };
 
+      
+
 export default VentaModal;
+ 
+ 

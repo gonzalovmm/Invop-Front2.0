@@ -36,7 +36,7 @@ function VentaArticuloTabla({ ventaID }: { ventaID: number }) {
                     <tbody>
                          {ventaArticulos.map(ventaArticulo => (
                             <tr key={ventaArticulo.id}>
-                                <td className="py-2 px-4 border-b">{ventaArticulo.id}</td>
+                                <td className="py-2 px-4 border-b">{ventaArticulo.id_articulo.id}</td>
                                 <td className="py-2 px-4 border-b">{ventaArticulo.subtotal}</td>
                                 <td className="py-2 px-4 border-b">{ventaArticulo.cantidadVenta}</td>
                             </tr>

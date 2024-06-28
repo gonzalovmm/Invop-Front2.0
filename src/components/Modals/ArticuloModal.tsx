@@ -29,9 +29,9 @@ const ArticuloModal = ({
   refreshData,
 }: ArticuloModalProps) => {
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-  const [proveedorSeleccionado, setProveedorSeleccionado]= useState<Proveedor|null>(null);
+  const [proveedorSeleccionado, setProveedorSeleccionado] = useState<Proveedor | null>(null);
   const [isNew, setIsNew] = useState(articulo.id === 0);
-  const [valoresCalculados, setValoresCalculados] = useState({ cgi: 0, loteOptimo: 0, puntoPedido: 0 });
+
 
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const ArticuloModal = ({
     tiempoRevision: articulo?.tiempoRevision || 0,
     proveedorPred: articulo?.proveedorPred || 0,
   };
-  
+  // const [valoresCalculados, setValoresCalculados] = useState({ initialValues });
   //CREATE-UPDATE
   const handleSaveUpdate = async (art: Articulo) => {
     try {
@@ -93,23 +93,27 @@ const ArticuloModal = ({
     refreshData(prevState => !prevState);
   };
 
-  const handleCalculate = async () => {
-    try {
-      if (!articulo) {
-        throw new Error("No hay un artículo seleccionado para calcular");
-      }
-      const updatedValores = await ArticuloService.calcularTodo(articulo.id); // Ajusta el método según tu lógica
-      setValoresCalculados({
-        cgi: updatedValores.cgi,
-        loteOptimo: updatedValores.loteOptimo,
-        puntoPedido: updatedValores.puntoPedido,
-      });
-      toast.success("Cálculo completado con éxito");
-    } catch (error) {
-      console.error(error);
-      toast.error("Error al calcular valores del artículo");
-    }
-  };
+  // const handleCalculate = async () => {
+  //   try {
+  //     if (!articulo) {
+  //       throw new Error("No hay un artículo seleccionado para calcular");
+  //     }
+  //     const updatedValores = await ArticuloService.calcularTodo(articulo.id); // Ajusta el método según tu lógica
+  //     setValoresCalculados({
+  //       cgi: updatedValores.cgi,
+  //       demandaAnual: updatedValores.demandaAnual,
+  //       stockSeguridad: updatedValores.stockSeguridad,
+  //       loteOptimo: updatedValores.loteOptimo,
+  //       puntoPedido: updatedValores.puntoPedido,
+  //       cantidadMaxima: updatedValores.cantidadMaxima,
+  //       cantidadAPedir: updatedValores.cantidadAPedir
+  //     });
+  //     toast.success("Cálculo completado con éxito");
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Error al calcular valores del artículo");
+  //   }
+  // };
 
   //DELETE
   const handleDelete = async () => {
@@ -139,7 +143,7 @@ const ArticuloModal = ({
       .required('Se requiere el tiempo de revisión')
       .nonNullable('El tiempo de revisión no puede ser nulo'),
     stockActual: Yup.number().integer('El stock actual debe ser un entero')
-     
+
 
   });
 
@@ -153,7 +157,7 @@ const ArticuloModal = ({
 
   return (
     <>
-    
+
       {modalType === ModalType.DELETE ? (
         <Modal show={show} onHide={onHide} centered backdrop="static">
           <div className="p-6 bg-white rounded-lg shadow-xl">
@@ -167,32 +171,42 @@ const ArticuloModal = ({
             </ModalFooter>
           </div>
         </Modal>
-      )  : modalType === ModalType.DETAIL ? (
+      ) : modalType === ModalType.DETAIL ? (
         <Modal show={show} onHide={onHide} centered backdrop="static">
+
           <Modal.Header closeButton>
-            <Modal.Title>{nombre}</Modal.Title>
+            <Modal.Title>{articulo.nombre}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Table className='min-w-full bg-white border border-gray-300'>
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b">CGI</th>
-                  <th className="py-2 px-4 border-b">Lote Óptimo</th>
-                  <th className="py-2 px-4 border-b">Punto de Pedido</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="py-2 px-4 border-b">{valoresCalculados.cgi}</td>
-                  <td className="py-2 px-4 border-b">{valoresCalculados.loteOptimo}</td>
-                  <td className="py-2 px-4 border-b">{valoresCalculados.puntoPedido}</td>
-                </tr>
-              </tbody>
-            </Table>
+            <div className="overflow-x-auto">
+              <Table className='min-w-full bg-white border border-gray-300'>
+
+                <thead className="bg-gray-200">
+                  <tr>
+                    <th className="py-2 px-4 border-b">Nombre</th>
+                    <th className="py-2 px-4 border-b">Precio</th>
+                    <th className="py-2 px-4 border-b">CGI</th>
+                    <th className="py-2 px-4 border-b">Lote Óptimo</th>
+                    <th className="py-2 px-4 border-b">Punto de Pedido</th>
+                    <th className="py-2 px-4 border-b">Modelo Inventario</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="py-2 px-4 border-b">{articulo.nombre}</td>
+                    <td className="py-2 px-4 border-b">{articulo.precio}</td>
+                    <td className="py-2 px-4 border-b">{articulo.cgi}</td>
+                    <td className="py-2 px-4 border-b">{articulo.loteOptimo}</td>
+                    <td className="py-2 px-4 border-b">{articulo.puntoPedido}</td>
+                    <td className="py-2 px-4 border-b">{articulo.modeloInventario}</td>
+                  </tr>
+                </tbody>
+              </Table>
+            </div>
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={onHide}>Cerrar</Button>
-            <Button variant="primary" onClick={handleCalculate}>Calcular Valores</Button>
+            <Button variant="primary" onClick={onHide}>Calcular Valores</Button>
           </Modal.Footer>
         </Modal>
       ) : (
@@ -251,26 +265,26 @@ const ArticuloModal = ({
                     {formik.errors.tiempoRevision}
                   </Form.Control.Feedback>
                 </Form.Group>
-                
+
                 {/* stockactual */}
 
                 {isNew && (
-              <Form.Group className="mb-4">
-                <FormLabel className="block text-gray-700">Stock Actual</FormLabel>
-                <Form.Control
-                  name="stockActual"
-                  type="number"
-                  value={formik.values.stockActual}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  isInvalid={Boolean(formik.errors.stockActual && formik.touched.stockActual)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                />
-                <Form.Control.Feedback type="invalid">
-                  {formik.errors.stockActual}
-                </Form.Control.Feedback>
-              </Form.Group>
-            )}
+                  <Form.Group className="mb-4">
+                    <FormLabel className="block text-gray-700">Stock Actual</FormLabel>
+                    <Form.Control
+                      name="stockActual"
+                      type="number"
+                      value={formik.values.stockActual}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      isInvalid={Boolean(formik.errors.stockActual && formik.touched.stockActual)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {formik.errors.stockActual}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                )}
 
                 <Form.Group className="mb-4">
                   <FormLabel className="block text-gray-700">Modelo Inventario</FormLabel>
@@ -294,7 +308,7 @@ const ArticuloModal = ({
                     {formik.errors.modeloInventario}
                   </Form.Control.Feedback>
                 </Form.Group>
-              
+
                 <Form.Group className="mb-4">
                   <FormLabel className="block text-gray-700">Proveedor</FormLabel>
                   <Form.Control
@@ -302,7 +316,7 @@ const ArticuloModal = ({
                     value={proveedorSeleccionado?.id}
                     onChange={(e) => {
                       const selectedId = Number(e.target.value); // Convertir a número
-                      const selectedProveedor = proveedores.find(proveedor => proveedor.id === selectedId)||null;
+                      const selectedProveedor = proveedores.find(proveedor => proveedor.id === selectedId) || null;
                       setProveedorSeleccionado(selectedProveedor);
                       formik.setFieldValue("proveedorPred", selectedProveedor);
                     }}

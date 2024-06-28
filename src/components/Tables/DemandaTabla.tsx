@@ -41,9 +41,9 @@ const DemandaTabla: React.FC = () => {
                 <tbody>
                     {demandas.map((demanda) => (
                         <tr key={demanda.id}>
-                            <td className="py-2 px-4 border-b">{new (demanda.idArticulo.id)}</td>
-                            <td className="py-2 px-4 border-b">{new Date(demanda.fechaDesde).toLocaleDateString()}</td>
-                            <td className="py-2 px-4 border-b">{new Date(demanda.fechaHasta).toLocaleDateString()}</td>
+                            <td className="py-2 px-4 border-b">{demanda.idArticulo.id}</td>
+                            <td className="py-2 px-4 border-b">{new Date (demanda.fechaDesde).toLocaleString()}</td>
+                            <td className="py-2 px-4 border-b">{new Date (demanda.fechaHasta).toLocaleString()}</td>
                             
                         </tr>
                     ))}

@@ -11,7 +11,7 @@ export const PrediccionDemandaService = {
         }
         return await response.json();
     },
-    getPrediccion: async (idArticulo: number): Promise<PrediccionDemanda> => {
+    getPrediccion: async (idArticulo: number): Promise<PrediccionDemanda[]> => {
         const response = await fetch(`${BASE_URL}/api/v1/prediccionDemanda/find/${idArticulo}`);
         const data = await response.json();
         return data;

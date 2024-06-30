@@ -7,7 +7,7 @@ import { ModalType } from '../../types/ModalType';
 import { Demanda } from '../../types/Demanda';
 import { Articulo } from '../../types/Articulo';
 import { Proveedor } from '../../types/Proveedor';
-import { ModeloInventario } from '../../types/ModeloInventario';
+import { ModeloInventario } from '../../enums/ModeloInventario';
 
 function VentaTabla () {
     const [ventas, setVentas] = useState<Venta[]>([]);

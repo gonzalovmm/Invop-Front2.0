@@ -1,4 +1,5 @@
-import { ModeloInventario } from "./ModeloInventario";
+import { MetodoPrediccion } from "../enums/MetodoPreddiccion";
+import { ModeloInventario } from "../enums/ModeloInventario";
 import { Proveedor } from "./Proveedor";
 
 export interface Articulo{
@@ -17,6 +18,7 @@ export interface Articulo{
     stockActual: number;	
     stockSeguridad: number;
     tiempoRevision: number;	
-    proveedorPred: Proveedor;	
+    proveedorPred: Proveedor;
+    metodoPred: MetodoPrediccion;	
 }
 

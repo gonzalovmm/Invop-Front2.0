@@ -3,7 +3,7 @@ import { Button } from 'react-bootstrap';
 import { DemandaService } from '../../services/DemandaService';
 import DemandaModal from '../Modals/DemandaModal';
 import { Demanda } from '../../types/Demanda';
-import { ModeloInventario } from '../../types/ModeloInventario';
+import { ModeloInventario } from '../../enums/ModeloInventario';
 import { Articulo } from '../../types/Articulo';
 import { Proveedor } from '../../types/Proveedor';
 

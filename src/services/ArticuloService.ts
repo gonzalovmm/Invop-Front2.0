@@ -3,12 +3,6 @@ import { Articulo } from "../types/Articulo";
 const BASE_URL ='http://localhost:8082'; 
 
 export const ArticuloService = {
-    getVentas:async (): Promise<Articulo[]>=>{
-        const response = await fetch(`${BASE_URL}/api/v1/ventas`);
-        const data = await response.json();
-        return data;
-    },
-
     // Me devuelve un array con todos los articulos
     getArticulos:async (): Promise<Articulo[]> => {
         const response = await fetch(`${BASE_URL}/api/v1/articulos`);

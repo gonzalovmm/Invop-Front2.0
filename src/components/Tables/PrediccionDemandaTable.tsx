@@ -3,8 +3,9 @@ import { useParams } from 'react-router-dom';
 import { PrediccionDemanda } from '../../types/PrediccionDemanda';
 import { ParametrosPrediccionDTO } from '../../types/ParametrosPrediccionDTO';
 import { PrediccionDemandaService } from '../../services/PrediccionDemandaService';
-import { MetodoPrediccion } from '../../types/MetodoPrediccion';
+
 import { Button } from 'react-bootstrap';
+import { MetodoPrediccion } from '../../enums/MetodoPreddiccion';
 
 
 
@@ -36,7 +37,7 @@ const PrediccionDemandaTable: React.FC = () => {
             coeficientes: [0.1, 0.2, 0.3], // Ejemplo de coeficientes
             mesPrediccion: new Date().getMonth() + 1,
             anioPrediccion: new Date().getFullYear(),
-            metodoPrediccion: MetodoPrediccion.PROMEDIO_MOVIL, // Ejemplo de método
+            metodoPrediccion: MetodoPrediccion.PROMEDIO_MOVIL_PONDERADO, // Ejemplo de método
             alfa: 0.1,
             cantidadPeriodosAPredecir: 12,
             cantidadPeriodosAUsar: 12,
@@ -63,7 +64,7 @@ const PrediccionDemandaTable: React.FC = () => {
             coeficientes: [0.1, 0.2, 0.3], // Ejemplo de coeficientes
             mesPrediccion: new Date().getMonth() + 1,
             anioPrediccion: new Date().getFullYear(),
-            metodoPrediccion: MetodoPrediccion.SUAVIZACION_EXPONENCIAL, // Ejemplo de método
+            metodoPrediccion: MetodoPrediccion.PROMEDIO_MOVIL_PONDERADO, // Ejemplo de método
             alfa: 0.1,
             cantidadPeriodosAPredecir: 12,
             cantidadPeriodosAUsar: 12,

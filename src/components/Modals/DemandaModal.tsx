@@ -4,7 +4,7 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import { DemandaService } from '../../services/DemandaService';
 import { toast } from 'react-toastify';
 import { Articulo } from '../../types/Articulo';
-import { ModeloInventario } from '../../types/ModeloInventario';
+import { ModeloInventario } from '../../enums/ModeloInventario';
 import { Proveedor } from '../../types/Proveedor';
 
 type DemandaModalProps = {

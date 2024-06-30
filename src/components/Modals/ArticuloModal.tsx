@@ -2,7 +2,7 @@ import { Articulo } from "../../types/Articulo";
 import { ModalType } from "../../types/ModalType";
 import { useEffect, useState } from "react";
 import { Proveedor } from "../../types/Proveedor";
-import { ModeloInventario } from "../../types/ModeloInventario";
+import { ModeloInventario } from "../../enums/ModeloInventario";
 import { ArticuloService } from "../../services/ArticuloService";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
@@ -70,6 +70,7 @@ const ArticuloModal = ({
     stockSeguridad: articulo?.stockSeguridad || 0,
     tiempoRevision: articulo?.tiempoRevision || 0,
     proveedorPred: articulo?.proveedorPred || 0,
+    metodoPred: articulo?.metodoPred || "",
   };
   // const [valoresCalculados, setValoresCalculados] = useState({ initialValues });
   //CREATE-UPDATE
@@ -198,7 +199,7 @@ const ArticuloModal = ({
                     <td className="py-2 px-4 border-b">{articulo.cgi}</td>
                     <td className="py-2 px-4 border-b">{articulo.loteOptimo}</td>
                     <td className="py-2 px-4 border-b">{articulo.puntoPedido}</td>
-                    <td className="py-2 px-4 border-b">{articulo.modeloInventario}</td>
+                    <td className="py-2 px-4 border-b">{articulo.modeloInventario.replace('_', ' ')}</td>
                   </tr>
                 </tbody>
               </Table>
@@ -327,7 +328,7 @@ const ArticuloModal = ({
                     <option value="">Selecciona un Proveedor</option>
                     {proveedores.map(proveedor => (
                       <option key={proveedor.id} value={proveedor.id}>
-                        {proveedor.nombre}
+                        {proveedor.nombreProveedor}
                       </option>
                     ))}
                   </Form.Control>

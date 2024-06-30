@@ -17,4 +17,17 @@ export const ProveedorArticuloService={
         const data= await response.json();
         return data;
     },
+
+    getProvArt: async (id: number): Promise <ProveedorArticulo[]>=>{
+        const response= await fetch(`${BASE_URL}/api/v1/proveedorarticulo/findProveedoresByArticulo/${id}`,{
+            method: "GET", 
+            headers:{
+                'Accept': '*/*',
+                'Authorization': `Bearer ` + localStorage.getItem('token'),
+                'Content-Type': 'application/json'
+            }
+        });
+        const data=await response.json();
+        return data;
+    },
 }
